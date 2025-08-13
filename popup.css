@@ -1,0 +1,109 @@
+/* popup.css - restored original style */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 360px;
+    background: #f7f9fb;
+}
+
+.extension-container {
+    box-shadow: 0 6px 20px rgba(18, 38, 63, 0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.extension-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0b4da2;
+    color: #ffffff;
+    padding: 12px 14px;
+}
+
+.header-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.header-button {
+    background-color: #ff3b30;
+    border: none;
+    color: white;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.header-button:hover {
+    opacity: 0.95;
+}
+
+.tabs-container {
+    display: flex;
+    border-bottom: 1px solid #e6eef7;
+    background: #f2f6fb;
+}
+
+.tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.tab.active {
+    background: #ffffff;
+    border-bottom: 3px solid #0b4da2;
+}
+
+.content-container {
+    padding: 12px;
+}
+
+.tab-content {
+    padding-top: 6px;
+}
+
+.placeholder {
+    color: #6b7280;
+    font-style: italic;
+}
+
+.loading {
+    text-align: center;
+    padding: 14px 8px;
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #e6eef7;
+    border-top: 3px solid #0b4da2;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-box {
+    background: #fff0f0;
+    border: 1px solid #ffd6d6;
+    color: #b91c1c;
+    padding: 8px;
+    border-radius: 6px;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.hidden { display: none; }

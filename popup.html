@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Know Now Extension</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+    <div class="extension-container">
+        <header class="extension-header">
+            <h1 class="header-title">Know Now</h1>
+            <button id="analyzeButton" class="header-button">Analyze Page</button>
+        </header>
+
+        <div class="tabs-container">
+            <div class="tab active" data-tab="summary">AI Summary</div>
+            <div class="tab" data-tab="risky">Risky Terms</div>
+        </div>
+
+        <div class="content-container">
+            <div id="loading" class="hidden loading">
+                <div class="spinner"></div>
+                <p>Analyzing the page...</p>
+            </div>
+
+            <section id="summaryContent" class="tab-content">
+                <div id="summaryText">
+                    <p class="placeholder">Click "Analyze Page" to get a summary.</p>
+                </div>
+            </section>
+
+            <section id="riskyContent" class="tab-content hidden">
+                <div id="riskyTermsText">
+                    <p class="placeholder">No risky terms found.</p>
+                </div>
+            </section>
+
+            <div id="error" class="hidden error-box">
+                <p class="error-text">An error occurred. Please try again later.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
