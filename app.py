@@ -31,16 +31,16 @@ def analyze_policy():
         # 2. Optimized Structured Prompt
         # Instructs AI to provide a clean, consistent format for both languages
         prompt = (
-            "Analyze this privacy policy. Return a valid JSON object with 'en' and 'ta' keys. "
-            "For each language, provide a 'summary' string formatted exactly with these bold headers: "
-            "\n**1. DATA COLLECTED:** (List specific data items) "
-            "\n**2. PERMANENT RULES:** (Irreversible rules) "
-            "\n**3. YOUR RIGHTS:** (User controls). "
-            "Keep the language simple and friendly. "
-            "Also provide a 'riskyTerms' list containing 5-7 dangerous clauses found in the text."
-            f"\n\nTEXT TO ANALYZE:\n{policy_text[:15000]}"
+            "Analyze this privacy policy. Return a JSON object with 'en' and 'ta' keys. "
+            "For each language, provide a 'summary' string using these three clear, professional headers: "
+            "\n### 📊 WHAT THEY COLLECT ABOUT YOU\n(Explain data items like location, identity, and behavior) "
+            "\n### 🔒 THE RULES YOU AGREE TO\n(Permanent rules regarding content usage and account behavior) "
+            "\n### ⚖️ YOUR REMAINING PRIVACY CONTROLS\n(Rights you still have, like deleting data or opting out). "
+            "CRITICAL: Keep language simple for non-experts. Do not use italics (*) or background highlight tags. "
+            "Also, provide a 'riskyTerms' list. For large platforms, you must identify at least 5 "
+            "concerns like content licensing or long-term data retention."
+            f"\n\nTEXT:\n{policy_text[:15000]}"
         )
-
         # 3. Call Gemini 2.0 Flash with JSON constraint
         response = client.models.generate_content(
             model="gemini-2.0-flash",

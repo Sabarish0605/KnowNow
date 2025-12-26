@@ -19,7 +19,6 @@ body {
 
 .header-title { font-size: 18px; color: #f8e0b0; margin: 0; }
 
-/* Fixed Close Button */
 .close-button {
     background: none;
     border: none;
@@ -40,7 +39,6 @@ body {
 .tab { cursor: pointer; color: #9aa0a6; font-weight: 600; padding-bottom: 5px; }
 .tab.active { color: #f0e6d2; border-bottom: 2px solid #f0e6d2; }
 
-/* Progress Bar Container */
 .loading { text-align: center; padding: 20px 0; color: #f0e6d2; }
 .progress-container {
     width: 100%;
@@ -58,8 +56,39 @@ body {
     transition: width 0.3s ease;
 }
 
-.tab-content { font-size: 14px; line-height: 1.6; color: #e8eaed; }
-.placeholder { color: #9aa0a6; font-style: italic; text-align: center; padding: 20px; }
+/* --- THE SUMMARY STYLE (CLEAN & PROFESSIONAL) --- */
+#summaryText {
+    text-align: left;
+    line-height: 1.6;
+    font-size: 14px;
+    padding: 10px;
+    color: #e8eaed;
+}
+
+/* Remove italics from entire summary area */
+#summaryText * {
+    font-style: normal !important;
+}
+
+/* Yellow Header Bar from your screenshot */
+.summary-header {
+    color: #ffca28;
+    margin-top: 15px;
+    display: block;
+    font-weight: bold;
+    font-size: 15px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+}
+
+/* Remove yellow highlights but keep text bold */
+.highlight {
+    background: none !important;
+    color: inherit !important;
+    padding: 0 !important;
+    font-weight: bold;
+}
 
 #riskyTermsText ul { padding-left: 0; list-style: none; }
 #riskyTermsText li {
@@ -67,6 +96,7 @@ body {
     border-left: 3px solid #f0e6d2;
     padding: 10px;
     margin-bottom: 8px;
+    font-style: normal;
 }
 
 #analyzeButton {

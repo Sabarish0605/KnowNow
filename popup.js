@@ -1,4 +1,4 @@
-let cachedData = null; // Stores { en: {...}, ta: {...} }
+let cachedData = null; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const analyzeBtn = document.getElementById('analyzeButton');
@@ -9,41 +9,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const summaryText = document.getElementById('summaryText');
     const riskyTermsText = document.getElementById('riskyTermsText');
 
-    // --- Seamless Switcher: Now refreshes BOTH sections ---
     const updateDisplay = () => {
         if (!cachedData) return;
 
-        const lang = langSelect.value; // 'en' or 'ta'
+        const lang = langSelect.value; 
         const content = cachedData[lang];
 
-        // 1. Update Summary (with formatting)
-        const formattedSummary = String(content.summary || "").replace(/\n/g, '<br>');
+        // 1. Process Summary: Remove Italics and Highlights
+        let rawSummary = String(content.summary || "");
+        
+        // Remove markdown italics/bold (*) and clean any leftover highlight tags
+        let cleanSummary = rawSummary.replace(/\*/g, '');
+
+        // Convert ### Headers into your yellow headers
+        let formattedSummary = cleanSummary.replace(/### (.*)/g, '<span class="summary-header">$1</span>');
+        
+        // Convert newlines to line breaks
+        formattedSummary = formattedSummary.replace(/\n/g, '<br>');
+
         summaryText.innerHTML = formattedSummary;
 
-        // 2. Update Risky Terms (clears old language and adds new)
+        // 2. Process Risky Terms
         riskyTermsText.innerHTML = ""; 
-        if (content.riskyTerms && content.riskyTerms.length > 0) {
+        const terms = content.riskyTerms || [];
+        
+        if (terms.length > 0) {
             const ul = document.createElement('ul');
-            ul.style.listStyleType = "none";
-            ul.style.padding = "0";
-
-            content.riskyTerms.forEach((term, index) => {
+            terms.forEach((term, index) => {
                 const li = document.createElement('li');
-                // Clean symbols and add numbered points
-                const cleanTerm = String(term).replace(/[^\x20-\x7E\u0B80-\u0BFF]/g, '').trim();
-                li.innerText = `${index + 1}. ${cleanTerm}`;
+                // Ensure no italics in risky terms
+                li.style.fontStyle = "normal";
+                const cleanTerm = String(term).replace(/\*/g, '').trim();
+                li.innerHTML = `<strong>${index + 1}.</strong> ${cleanTerm}`;
                 ul.appendChild(li);
             });
             riskyTermsText.appendChild(ul);
         } else {
-            riskyTermsText.innerText = lang === 'ta' ? "அபாயங்கள் ஏதும் கண்டறியப்படவில்லை." : "No risks detected.";
+            const noRiskMsg = lang === 'ta' ? "அபாயங்கள் ஏதும் கண்டறியப்படவில்லை." : "Analysis complete: No risky clauses detected.";
+            riskyTermsText.innerHTML = `<p style="text-align:center; padding-top:20px; color:#9aa0a6;">${noRiskMsg}</p>`;
         }
     };
 
-    // Trigger update whenever the dropdown changes
     langSelect.addEventListener('change', updateDisplay);
 
-    // --- Tab Logic ---
+    // Tab Switcher Logic
     const tabs = document.querySelectorAll('.tab');
     const tabContents = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => {
@@ -60,11 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Analyze Logic ---
+    // Analysis Execution
     analyzeBtn.addEventListener('click', async () => {
         loading.classList.remove('hidden');
-        summaryText.innerText = "";
-        riskyTermsText.innerText = "";
+        summaryText.innerHTML = ""; 
+        riskyTermsText.innerHTML = "";
         
         let progress = 0;
         progressBar.style.width = "0%";
@@ -90,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ text: injection[0].result })
             });
 
-            if (!response.ok) throw new Error("Server Error");
+            if (!response.ok) throw new Error("Server Connection Failed");
 
             cachedData = await response.json();
             
@@ -100,13 +109,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             setTimeout(() => {
                 loading.classList.add('hidden');
-                updateDisplay(); // This now updates both Summary and Risky Terms
+                updateDisplay(); 
             }, 600);
 
         } catch (err) {
             clearInterval(interval);
             loading.classList.add('hidden');
-            summaryText.innerText = "Error: " + err.message;
+            summaryText.innerText = "Unable to reach the analysis server. Please check your connection.";
         }
     });
 
