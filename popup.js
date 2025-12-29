@@ -1,4 +1,4 @@
-let cachedData = null; 
+let cachedData = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const analyzeBtn = document.getElementById('analyzeButton');
@@ -12,32 +12,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateDisplay = () => {
         if (!cachedData) return;
 
-        const lang = langSelect.value; 
+        const lang = langSelect.value;
         const content = cachedData[lang];
 
-        // 1. Process Summary: Remove Italics and Highlights
-        let rawSummary = String(content.summary || "");
-        
-        // Remove markdown italics/bold (*) and clean any leftover highlight tags
-        let cleanSummary = rawSummary.replace(/\*/g, '');
+        if (!content) {
+            summaryText.innerHTML = "No data available for this language.";
+            return;
+        }
 
-        // Convert ### Headers into your yellow headers
+        // 1. Process Summary
+        let rawSummary = String(content.summary || "");
+        let cleanSummary = rawSummary.replace(/\*/g, ''); // Remove markdown italics/bold
         let formattedSummary = cleanSummary.replace(/### (.*)/g, '<span class="summary-header">$1</span>');
-        
-        // Convert newlines to line breaks
         formattedSummary = formattedSummary.replace(/\n/g, '<br>');
 
         summaryText.innerHTML = formattedSummary;
 
         // 2. Process Risky Terms
-        riskyTermsText.innerHTML = ""; 
+        riskyTermsText.innerHTML = "";
         const terms = content.riskyTerms || [];
-        
+
         if (terms.length > 0) {
             const ul = document.createElement('ul');
             terms.forEach((term, index) => {
                 const li = document.createElement('li');
-                // Ensure no italics in risky terms
                 li.style.fontStyle = "normal";
                 const cleanTerm = String(term).replace(/\*/g, '').trim();
                 li.innerHTML = `<strong>${index + 1}.</strong> ${cleanTerm}`;
@@ -71,8 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Analysis Execution
     analyzeBtn.addEventListener('click', async () => {
+        // Reset UI
         loading.classList.remove('hidden');
-        summaryText.innerHTML = ""; 
+        summaryText.innerHTML = "";
         riskyTermsText.innerHTML = "";
         
         let progress = 0;
@@ -87,19 +86,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
 
         try {
+            // Get Tab and Content
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            
+            // Check if it's a valid webpage (not chrome:// settings)
+            if (tab.url.startsWith("chrome://")) {
+                throw new Error("Cannot analyze browser settings pages.");
+            }
+
             const injection = await chrome.scripting.executeScript({
                 target: { tabId: tab.id },
                 func: () => document.body.innerText
             });
 
-            const response = await fetch("http://127.0.0.1:5000/analyze-policy", {
+            const policyContent = injection[0].result;
+
+            // Fetch request to Local Desktop App Server
+            // IMPORTANT: Ensure this port matches your app.py (e.g., 5001)
+            const response = await fetch('http://127.0.0.1:5001/analyze-policy', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: injection[0].result })
+                body: JSON.stringify({ text: policyContent })
             });
 
-            if (!response.ok) throw new Error("Server Connection Failed");
+            if (!response.ok) throw new Error("Server error: " + response.status);
 
             cachedData = await response.json();
             
@@ -109,13 +119,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             setTimeout(() => {
                 loading.classList.add('hidden');
-                updateDisplay(); 
+                updateDisplay();
             }, 600);
 
         } catch (err) {
             clearInterval(interval);
             loading.classList.add('hidden');
-            summaryText.innerText = "Unable to reach the analysis server. Please check your connection.";
+            console.error("Extension Error:", err);
+            summaryText.innerHTML = `<p style="color:#ff5252; padding:10px;">
+                <strong>Connection Failed:</strong><br>
+                1. Ensure your KnowNow Desktop App is open.<br>
+                2. Check if the port (5001) is correct.<br>
+                3. Check your firewall settings.
+            </p>`;
         }
     });
 
