@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+<div class="extension-container">
+    <div class="extension-header">
+        <h1 class="header-title">Know Now</h1>
+        <button id="closeButton" class="close-button">×</button>
+    </div>
+
+    <div class="language-select-container">
+        <span class="language-label">Language:</span>
+        <select id="languageSelect" class="language-dropdown">
+            <option value="en">English</option>
+            <option value="ta">Tamil</option>
+        </select>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tab active" data-tab="summary">Summary</div>
+        <div class="tab" data-tab="risky">Risky Terms</div>
+    </div>
+
+    <div class="content-container">
+        <div id="loading" class="loading hidden">
+            <p>Analyzing Policy...</p>
+            <div class="progress-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <p id="progressPercent">0%</p>
+        </div>
+
+        <div id="error" class="hidden"></div>
+
+        <div id="summaryContent" class="tab-content">
+            <div id="summaryText" class="placeholder">Click "Analyze Page"</div>
+        </div>
+
+        <div id="riskyTermsContent" class="tab-content hidden">
+            <div id="riskyTermsText" class="placeholder">No risky terms detected.</div>
+        </div>
+
+        <button id="analyzeButton" class="header-button" style="margin-top:20px; width:100%;">
+            Analyze Page
+        </button>
+    </div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
