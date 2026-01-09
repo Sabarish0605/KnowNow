@@ -1,3 +1,4 @@
+// popup.js
 let cachedData = null; 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,27 +10,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const summaryText = document.getElementById('summaryText');
     const riskyTermsText = document.getElementById('riskyTermsText');
 
+    // CHECK STORAGE FOR EXISTING RESULTS
+    chrome.storage.local.get(['analysisResult'], (result) => {
+        if (result.analysisResult) {
+            cachedData = result.analysisResult;
+            updateDisplay();
+            // Optional: chrome.storage.local.remove('analysisResult'); // Clear after use
+        }
+    });
+
     const updateDisplay = () => {
         if (!cachedData) return;
 
         const lang = langSelect.value; 
         const content = cachedData[lang];
 
-        // 1. Process Summary: Remove Italics and Highlights
         let rawSummary = String(content.summary || "");
-        
-        // Remove markdown italics/bold (*) and clean any leftover highlight tags
         let cleanSummary = rawSummary.replace(/\*/g, '');
-
-        // Convert ### Headers into your yellow headers
         let formattedSummary = cleanSummary.replace(/### (.*)/g, '<span class="summary-header">$1</span>');
-        
-        // Convert newlines to line breaks
         formattedSummary = formattedSummary.replace(/\n/g, '<br>');
 
         summaryText.innerHTML = formattedSummary;
 
-        // 2. Process Risky Terms
         riskyTermsText.innerHTML = ""; 
         const terms = content.riskyTerms || [];
         
@@ -37,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const ul = document.createElement('ul');
             terms.forEach((term, index) => {
                 const li = document.createElement('li');
-                // Ensure no italics in risky terms
                 li.style.fontStyle = "normal";
                 const cleanTerm = String(term).replace(/\*/g, '').trim();
                 li.innerHTML = `<strong>${index + 1}.</strong> ${cleanTerm}`;
@@ -45,8 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             riskyTermsText.appendChild(ul);
         } else {
-            const noRiskMsg = lang === 'ta' ? "அபாயங்கள் ஏதும் கண்டறியப்படவில்லை." : "Analysis complete: No risky clauses detected.";
-            riskyTermsText.innerHTML = `<p style="text-align:center; padding-top:20px; color:#9aa0a6;">${noRiskMsg}</p>`;
+            riskyTermsText.innerHTML = `<p style="text-align:center; padding-top:20px; color:#9aa0a6;">No risks detected.</p>`;
         }
     };
 
@@ -69,15 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Analysis Execution
+    // Existing Analysis Button Logic
     analyzeBtn.addEventListener('click', async () => {
         loading.classList.remove('hidden');
         summaryText.innerHTML = ""; 
         riskyTermsText.innerHTML = "";
         
         let progress = 0;
-        progressBar.style.width = "0%";
-        
         const interval = setInterval(() => {
             if (progress < 90) {
                 progress += Math.random() * 8;
@@ -99,10 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ text: injection[0].result })
             });
 
-            if (!response.ok) throw new Error("Server Connection Failed");
-
             cachedData = await response.json();
-            
             clearInterval(interval);
             progressBar.style.width = "100%";
             progressPercent.innerText = "100%";
@@ -111,11 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 loading.classList.add('hidden');
                 updateDisplay(); 
             }, 600);
-
         } catch (err) {
             clearInterval(interval);
             loading.classList.add('hidden');
-            summaryText.innerText = "Unable to reach the analysis server. Please check your connection.";
+            summaryText.innerText = "Server error. Is the Flask server running?";
         }
     });
 

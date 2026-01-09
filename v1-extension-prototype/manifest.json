@@ -3,8 +3,17 @@
   "name": "Know Now Extension",
   "version": "1.0",
   "description": "Helps users understand privacy policies with AI summaries.",
-  "permissions": ["activeTab", "scripting", "tabs"],
-  "host_permissions": ["http://127.0.0.1/*", "<all_urls>"],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "<all_urls>"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -12,5 +21,11 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
 }
